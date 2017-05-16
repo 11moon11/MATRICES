@@ -5,8 +5,9 @@ public class RunExamples {
     public static void main(String[] args) {
         //InitExample.run();
         //AddExample.run();
-        MultiplicationExample.run();
+        //MultiplicationExample.run();
         //GetInfoExample.run();
+        SwitchRowsExample.run();
 
 
         System.out.println("------------------------------------");

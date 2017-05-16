@@ -7,15 +7,17 @@ package matrices;
 // TODO: Refactor this class to work with 'Arithmetic Expression' instead of 'Integer' class.
 public abstract class BasicMatrix {
     private Integer[][] matrix;
+    private int augmentInd;
     private int rows;
     private int cols;
 
-    public BasicMatrix(int rows, int cols) throws MatrixException {
+    BasicMatrix(int rows, int cols) throws MatrixException {
         if(rows < 1 || cols < 1)
             throw new MatrixException("Unable to set size to r=" + rows + " c=" + cols + ". Minimum matrix size is '1x1'");
 
         this.rows = rows;
         this.cols = cols;
+        augmentInd = -1;
 
         matrix = new Integer[rows][cols];
         for(int a=0; a<rows; a++) {
@@ -87,7 +89,7 @@ public abstract class BasicMatrix {
     }
 
     // TODO: optimize for diagonal matrices
-    public void multiply(BasicMatrix second) throws MatrixException {
+    private int[] performMultiplication(BasicMatrix second) throws MatrixException {
         if(cols != second.getRows())
             throw new MatrixException("Matrices can not be multiplied");
 
@@ -96,6 +98,7 @@ public abstract class BasicMatrix {
 
         int resultRows = rows;
         int resultCols = second.getCols();
+
         int[] newArr = new int[resultRows * resultCols];
         int ind = 0;
 
@@ -117,13 +120,18 @@ public abstract class BasicMatrix {
             }
         }
 
-        rows = resultRows;
-        cols = resultCols;
+        return newArr;
+    }
+
+    public void multiply(BasicMatrix second) {
+        int[] newArr = performMultiplication(second);
+
+        cols = second.getCols();
         matrix = new Integer[rows][cols];
 
-        ind = 0;
-        for(int a=0; a<resultRows; a++) {
-            for (int i = 0; i < resultCols; i++) {
+        int ind = 0;
+        for(int a=0; a<rows; a++) {
+            for (int i = 0; i <cols; i++) {
                 matrix[a][i] = newArr[ind];
                 ind++;
             }
@@ -132,9 +140,7 @@ public abstract class BasicMatrix {
 
     public void scalarMultiplication(int scalar) {
         for(int a=0; a<rows; a++) {
-            for(int i=0; i<cols; i++) {
-                matrix[a][i] *= scalar;
-            }
+            multiplyRow(a+1, scalar);
         }
     }
 
@@ -185,6 +191,45 @@ public abstract class BasicMatrix {
         return true;
     }
 
+    public boolean isInverse(BasicMatrix second) {
+        if(!haveSameDimensions(second))
+            return false;
+
+        int[] multRes = performMultiplication(second);
+
+        for(int i=0; i<multRes.length; i++)
+            if(multRes[i] != 1)
+                return false;
+
+        return true;
+    }
+
+    public void augment(BasicMatrix second) {
+        if(rows != second.getRows())
+            throw new MatrixException("Matrices must have the same amount of rows be augmented.");
+
+        Integer[][] newArr = new Integer[rows][cols+second.getCols()];
+
+        // Copy our elements first
+        for(int a=0; a<rows; a++) {
+            for(int i=0; i<cols; i++) {
+                newArr[a][i] = matrix[a][i];
+            }
+        }
+
+        augmentInd = cols;
+
+        // Add other elements
+        for(int a=0; a<second.getRows(); a++) {
+            for(int i=cols; i<cols+second.getCols(); i++) {
+                newArr[a][i] = second.getVal(a+1, i-cols+1);
+            }
+        }
+
+        cols = cols+second.getCols();
+        matrix = newArr;
+    }
+
     int getRows() {
         return rows;
     }
@@ -198,7 +243,12 @@ public abstract class BasicMatrix {
      * @return 1D Array containing specified row
      */
     private Integer[] getRow(int r) {
-        return matrix[r];
+        Integer[] row = new Integer[cols];
+
+        for(int i=0; i<cols; i++)
+            row[i] = matrix[r][i];
+
+        return row;
     }
 
     /**
@@ -207,6 +257,7 @@ public abstract class BasicMatrix {
      */
     private Integer[] getCol(int c) {
         Integer[] col = new Integer[rows];
+
         for (int a=0; a<rows; a++)
             col[a] = matrix[a][c];
 
@@ -217,6 +268,46 @@ public abstract class BasicMatrix {
         validateBounds(r, c);
 
         matrix[r-1][c-1] += value;
+    }
+
+    /**
+     * Switches specified rows of the matrix
+     * @param r1 First row id, '1' based
+     * @param r2 Second row id, '1' based
+     */
+    public void switchRows(int r1, int r2) throws MatrixException {
+        if(rows < 2)
+            throw new MatrixException("Not enough rows");
+
+        if(r1 < 1 ||  r1 > rows)
+            throw new MatrixException("Invalid first row index: " + r1);
+        if(r2 < 1 || r2 > rows)
+            throw new MatrixException("Invalid second row index: " + r2);
+
+        if(r1 == r2)
+            return;
+
+        Integer[] row1 = getRow(r1-1);
+        Integer[] row2 = getRow(r2-1);
+
+        for(int i=0; i<cols; i++) {
+            matrix[r1-1][i] = row2[i];
+            matrix[r2-1][i] = row1[i];
+        }
+    }
+
+    /**
+     * Multiplies selected row by specified scalar
+     * @param r Row number, '1' based
+     * @param scalar Scalar
+     * @throws IndexOutOfBoundsException Thrown when 'r' is out of bounds
+     */
+    public void multiplyRow(int r, int scalar) throws IndexOutOfBoundsException {
+        if(r < 1 || r > rows)
+            throw new IndexOutOfBoundsException("Row number " + r + " is out of bounds");
+
+        for(int i=0; i<cols; i++)
+            matrix[r-1][i] *= scalar;
     }
 
 
@@ -276,7 +367,7 @@ public abstract class BasicMatrix {
         return true;
     }
 
-    public int[][] toArray() {
+    int[][] toArray() {
         int[][] res = new int[rows][cols];
         for(int a=0; a<rows; a++) {
             for (int i = 0; i < cols; i++) {
@@ -294,7 +385,11 @@ public abstract class BasicMatrix {
         for(int a=0; a<rows; a++) {
             result.append("|");
             for(int i=0; i<cols; i++) {
+                if(i == augmentInd)
+                    result.append("= ");
+
                 result.append(matrix[a][i]);
+
                 if(i < cols-1)
                     result.append(" ");
             }
