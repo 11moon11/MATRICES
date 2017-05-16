@@ -32,9 +32,9 @@ public abstract class BasicMatrix {
         if(r != rows || c != cols)
             throw new MatrixException("Array has wrong dimensions");
 
-        for(int a=0; a<r; a++) {
-            for(int i=0; i<c; i++) {
-                matrix[a][i] = val[a][i];
+        for(int[] a : val) {
+            for(int v : a) {
+                setNextElement(v);
             }
         }
     }
@@ -68,11 +68,9 @@ public abstract class BasicMatrix {
         return matrix[r-1][c-1];
     }
 
-    public void addAt(int r, int c, int value) {
-        validateBounds(r, c);
 
-        matrix[r-1][c-1] += value;
-    }
+
+
 
     public void add(BasicMatrix second) throws MatrixException {
         if(!haveSameDimensions(second))
@@ -84,6 +82,91 @@ public abstract class BasicMatrix {
         for(int a=1; a<=rows; a++) {
             for(int i=1; i<=cols; i++) {
                 addAt(a, i, second.getVal(a, i));
+            }
+        }
+    }
+
+    // TODO: optimize for diagonal matrices
+    public void multiply(BasicMatrix second) throws MatrixException {
+        if(cols != second.getRows())
+            throw new MatrixException("Matrices can not be multiplied");
+
+        if(!isFull() || !second.isFull())
+            throw new MatrixException("At least one of the matrices is not full");
+
+        int resultRows = rows;
+        int resultCols = second.getCols();
+        int[] newArr = new int[resultRows * resultCols];
+        int ind = 0;
+
+        for(int a=0; a<rows; a++) {
+            for(int i=0; i<resultCols; i++) {
+                Integer[] r = getRow(a);
+                Integer[] c = second.getCol(i);
+
+                if(r.length != c.length)
+                    throw new MatrixException("Multiplication failed, invalid col and row lengths");
+
+                int newEntire = 0;
+                for(int x=0; x<r.length; x++) {
+                    newEntire += r[x] * c[x];
+                }
+
+                newArr[ind] = newEntire;
+                ind++;
+            }
+        }
+
+        rows = resultRows;
+        cols = resultCols;
+        matrix = new Integer[rows][cols];
+
+        ind = 0;
+        for(int a=0; a<resultRows; a++) {
+            for (int i = 0; i < resultCols; i++) {
+                matrix[a][i] = newArr[ind];
+                ind++;
+            }
+        }
+    }
+
+    public void scalarMultiplication(int scalar) {
+        for(int a=0; a<rows; a++) {
+            for(int i=0; i<cols; i++) {
+                matrix[a][i] *= scalar;
+            }
+        }
+    }
+
+    /**
+     * Transposes current matrix (Columns become rows and rows become columns)
+     */
+    public void transpose() {
+        Integer[] arr = new Integer[rows * cols];
+        int ind=0;
+
+        // Copy old values
+        for (int a=0; a<rows; a++) {
+            for(int i=0; i<cols; i++) {
+                arr[ind] = matrix[a][i];
+                ind++;
+            }
+        }
+
+        // Switch rows and cols
+        int tmp = rows;
+        rows = cols;
+        cols = tmp;
+        // Reinitialize array
+        matrix = new Integer[rows][cols];
+
+        ind = 0;
+
+        // Assign old values to a new array
+        for (int a=0; a<rows; a++) {
+            for(int i=0; i<cols; i++) {
+                matrix[a][i] = arr[ind];
+                ind++;
             }
         }
     }
@@ -102,18 +185,46 @@ public abstract class BasicMatrix {
         return true;
     }
 
-    public int getRows() {
+    int getRows() {
         return rows;
     }
 
-    public int getCols() {
+    int getCols() {
         return cols;
     }
 
+    /**
+     * @param r 2D Array row number, '0' based number.
+     * @return 1D Array containing specified row
+     */
+    private Integer[] getRow(int r) {
+        return matrix[r];
+    }
+
+    /**
+     * @param c 2D Array column number, '0' based number.
+     * @return 1D Array containing specified column
+     */
+    private Integer[] getCol(int c) {
+        Integer[] col = new Integer[rows];
+        for (int a=0; a<rows; a++)
+            col[a] = matrix[a][c];
+
+        return col;
+    }
+
+    private void addAt(int r, int c, int value) {
+        validateBounds(r, c);
+
+        matrix[r-1][c-1] += value;
+    }
+
+
+
+
+
     private boolean haveSameDimensions(BasicMatrix second) {
-        if(second.getRows() != rows || second.getCols() != cols)
-            return false;
-        return true;
+        return !(second.getRows() != rows || second.getCols() != cols);
     }
 
     private void validateBounds(int r, int c) throws IndexOutOfBoundsException {
@@ -123,7 +234,7 @@ public abstract class BasicMatrix {
             throw new IndexOutOfBoundsException("Col " + c + " is out of bounds!");
     }
 
-    public boolean isFull() {
+    private boolean isFull() {
         for(int a=0; a<rows; a++) {
             for(int i=0; i<cols; i++) {
                 if(matrix[a][i] == null)
@@ -149,6 +260,22 @@ public abstract class BasicMatrix {
         return true;
     }
 
+    public boolean isDiagonal() {
+        if(!isSquare())
+            return false;
+
+        for(int a=0; a<rows; a++) {
+            for (int i = 0; i < cols; i++) {
+                if(a == i)
+                    if(matrix[a][i] == 0) return false;
+                else
+                    if(matrix[a][i] != 0) return false;
+            }
+        }
+
+        return true;
+    }
+
     public int[][] toArray() {
         int[][] res = new int[rows][cols];
         for(int a=0; a<rows; a++) {
@@ -162,21 +289,21 @@ public abstract class BasicMatrix {
 
     // TODO: return formatted string (with aligned cols)
     public String toString() {
-        String result = "\n";
+        StringBuilder result = new StringBuilder("\n");
 
         for(int a=0; a<rows; a++) {
-            result += "|";
+            result.append("|");
             for(int i=0; i<cols; i++) {
-                result += matrix[a][i];
+                result.append(matrix[a][i]);
                 if(i < cols-1)
-                    result += " ";
+                    result.append(" ");
             }
 
-            result += "|";
+            result.append("|");
             if(a < rows-1)
-                result += "\n";
+                result.append("\n");
         }
 
-        return result;
+        return result.toString();
     }
 }

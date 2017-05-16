@@ -3,9 +3,10 @@
  */
 public class RunExamples {
     public static void main(String[] args) {
-        InitExample.run();
-        AddExample.run();
-        GetInfoExample.run();
+        //InitExample.run();
+        //AddExample.run();
+        MultiplicationExample.run();
+        //GetInfoExample.run();
 
 
         System.out.println("------------------------------------");

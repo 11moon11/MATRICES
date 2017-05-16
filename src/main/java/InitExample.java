@@ -24,10 +24,13 @@ public class InitExample {
 
         // Method two - with 1d array
         int[] arr2 = {1, 2, 3, 4};
+        int[] arr3 = {1, 2, 3, 4, 5, 6};
 
         BasicMatrix mat3 = new Vector(arr2);
+        BasicMatrix mat6 = new Matrix(2, 3);
         BasicMatrix mat4 = new Matrix(2, 2);
         mat4.set(arr2);
+        mat6.set(arr3);
 
         System.out.println("Initialized matrix 3:" + mat3.toString());
         System.out.println("Initialized matrix 4:" + mat4.toString());
@@ -38,5 +41,10 @@ public class InitExample {
             mat5.setNextElement(i);
         }
         System.out.println("Initialized matrix 5:" + mat5.toString());
+        System.out.println("Initialized matrix 6:" + mat6.toString());
+
+        // Identity matrix example:
+        BasicMatrix mat7 = new Identity(3);
+        System.out.println("Initialized matrix 7:" + mat7.toString());
     }
 }

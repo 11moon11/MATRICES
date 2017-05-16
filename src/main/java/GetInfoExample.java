@@ -22,11 +22,14 @@ public class GetInfoExample {
             BasicMatrix mat = new Matrix(2,2);
             mat.set(a);
             System.out.println("Matrix " + cnt + ": " + mat.toString());
+
             if(mat.isUpperTriangular())
                 System.out.println("Is Upper Triangular");
             else
                 System.out.println("Is not Upper Triangular");
+
             System.out.println();
+            cnt++;
         }
     }
 }
