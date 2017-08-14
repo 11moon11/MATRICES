@@ -8,7 +8,7 @@ public class SwitchRowsExample {
         System.out.println("------------------------------------");
         System.out.println("Switching Rows Example: ");
 
-        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        double[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         BasicMatrix mat1 = new Matrix(3, 3);
         mat1.set(arr);
 

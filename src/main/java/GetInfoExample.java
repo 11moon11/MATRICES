@@ -8,7 +8,7 @@ public class GetInfoExample {
     public static void run() {
         System.out.println("------------------------------------");
         System.out.println("Get Matrix Information Example");
-        int[][] arr = {
+        double[][] arr = {
                 {1, 2, 3, 4},
                 {1, 2, 0, 4},
                 {1, 2, 0, 0},
@@ -18,7 +18,7 @@ public class GetInfoExample {
             };
 
         int cnt = 1;
-        for(int[] a : arr) {
+        for(double[] a : arr) {
             BasicMatrix mat = new Matrix(2,2);
             mat.set(a);
             System.out.println("Matrix " + cnt + ": " + mat.toString());

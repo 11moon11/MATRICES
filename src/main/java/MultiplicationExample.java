@@ -8,9 +8,9 @@ public class MultiplicationExample {
         System.out.println("------------------------------------");
         System.out.println("Matrices multiplication example:");
 
-        int[] arr1 = {1, 2, 3, 4};
-        int[] arr2 = {1, 0, 6, 7};
-        int[] arr3 = {1, 2, 3};
+        double[] arr1 = {1, 2, 3, 4};
+        double[] arr2 = {1, 0, 6, 7};
+        double[] arr3 = {1, 2, 3};
 
         BasicMatrix mat1 = new Matrix(2, 2);
         BasicMatrix mat2 = new Matrix(2, 2);

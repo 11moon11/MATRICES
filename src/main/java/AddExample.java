@@ -4,12 +4,12 @@ public class AddExample {
     public static void run() {
         System.out.println("------------------------------------");
         System.out.println("Adding 2 matrices together example: ");
-        int[][] arr1 =
+        double[][] arr1 =
                 {
                         {1, 2},
                         {3, 4}
                 };
-        int[][] arr2 =
+        double[][] arr2 =
                 {
                         {4, 3},
                         {2, 1}

@@ -9,7 +9,7 @@ public class InitExample {
         System.out.println("How to init matrix example: ");
 
         // Method one - with 2d array
-        int[][] arr1 =
+        double[][] arr1 =
                 {
                         {1, 2},
                         {3, 4}
@@ -23,8 +23,8 @@ public class InitExample {
         System.out.println("Initialized matrix 2:" + mat2.toString());
 
         // Method two - with 1d array
-        int[] arr2 = {1, 2, 3, 4};
-        int[] arr3 = {1, 2, 3, 4, 5, 6};
+        double[] arr2 = {1, 2, 3, 4};
+        double[] arr3 = {1, 2, 3, 4, 5, 6};
 
         BasicMatrix mat3 = new Vector(arr2);
         BasicMatrix mat6 = new Matrix(2, 3);
@@ -37,7 +37,7 @@ public class InitExample {
 
         // Method three - element by element
         BasicMatrix mat5 = new Matrix(2, 2);
-        for(int i : arr2) {
+        for(double i : arr2) {
             mat5.setNextElement(i);
         }
         System.out.println("Initialized matrix 5:" + mat5.toString());

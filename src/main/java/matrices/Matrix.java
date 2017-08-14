@@ -10,7 +10,7 @@ public class Matrix extends BasicMatrix {
         super(rows, cols);
     }
 
-    public Matrix(int[][]val) {
+    public Matrix(double[][]val) {
         super(val.length, val[0].length);
         set(val);
     }
@@ -20,6 +20,11 @@ public class Matrix extends BasicMatrix {
         set(mtx.toArray());
     }
 
+    /**
+     * Returns new matrix as a result of the sum
+     * @param second Matrix that will be added
+     * @return return new BasicMatrix
+     */
     public BasicMatrix _add(BasicMatrix second) {
         BasicMatrix result = new Matrix(this);
         result.add(second);

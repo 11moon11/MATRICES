@@ -7,7 +7,7 @@ public class Zero extends BasicMatrix {
     public Zero(int size) {
         super(size, size);
 
-        int arr[] = new int[size*size];
+        double arr[] = new double[size*size];
         for(int i=0; i<size*size; i++)
             arr[i] = 0;
 

@@ -4,9 +4,9 @@ package matrices;
  * Created by kiril on 15.05.2017.
  */
 
-// TODO: Refactor this class to work with 'Arithmetic Expression' instead of 'Integer' class.
+// TODO: Refactor this class to work with 'Arithmetic Expression' instead of 'Double' class.
 public abstract class BasicMatrix {
-    private Integer[][] matrix;
+    private Double[][] matrix;
     private int augmentInd;
     private int rows;
     private int cols;
@@ -19,7 +19,7 @@ public abstract class BasicMatrix {
         this.cols = cols;
         augmentInd = -1;
 
-        matrix = new Integer[rows][cols];
+        matrix = new Double[rows][cols];
         for(int a=0; a<rows; a++) {
             for(int i=0; i<cols; i++) {
                 matrix[a][i] = null;
@@ -27,31 +27,31 @@ public abstract class BasicMatrix {
         }
     }
 
-    public void set(int[][] val) throws MatrixException {
+    public void set(double[][] val) throws MatrixException {
         int r = val.length;
         int c = val[0].length;
 
         if(r != rows || c != cols)
             throw new MatrixException("Array has wrong dimensions");
 
-        for(int[] a : val) {
-            for(int v : a) {
+        for(double[] a : val) {
+            for(double v : a) {
                 setNextElement(v);
             }
         }
     }
 
-    public void set(int[] val) throws MatrixException {
+    public void set(double[] val) throws MatrixException {
         int r = val.length;
 
         if(r != rows * cols)
             throw new MatrixException("Array has wrong length");
 
-        for(int v : val)
+        for(double v : val)
             setNextElement(v);
     }
 
-    public void setNextElement(Integer val) {
+    public void setNextElement(Double val) {
         for(int a=0; a<rows; a++) {
             for(int i=0; i<cols; i++) {
                 if(matrix[a][i] == null) {
@@ -64,7 +64,7 @@ public abstract class BasicMatrix {
         throw new MatrixException("Matrix is already complete");
     }
 
-    public Integer getVal(int r, int c) {
+    public Double getVal(int r, int c) {
         validateBounds(r, c);
 
         return matrix[r-1][c-1];
@@ -89,7 +89,7 @@ public abstract class BasicMatrix {
     }
 
     // TODO: optimize for diagonal matrices
-    private int[] performMultiplication(BasicMatrix second) throws MatrixException {
+    private double[] performMultiplication(BasicMatrix second) throws MatrixException {
         if(cols != second.getRows())
             throw new MatrixException("Matrices can not be multiplied");
 
@@ -99,18 +99,18 @@ public abstract class BasicMatrix {
         int resultRows = rows;
         int resultCols = second.getCols();
 
-        int[] newArr = new int[resultRows * resultCols];
+        double[] newArr = new double[resultRows * resultCols];
         int ind = 0;
 
         for(int a=0; a<rows; a++) {
             for(int i=0; i<resultCols; i++) {
-                Integer[] r = getRow(a);
-                Integer[] c = second.getCol(i);
+                Double[] r = getRow(a);
+                Double[] c = second.getCol(i);
 
                 if(r.length != c.length)
                     throw new MatrixException("Multiplication failed, invalid col and row lengths");
 
-                int newEntire = 0;
+                double newEntire = 0;
                 for(int x=0; x<r.length; x++) {
                     newEntire += r[x] * c[x];
                 }
@@ -124,10 +124,10 @@ public abstract class BasicMatrix {
     }
 
     public void multiply(BasicMatrix second) {
-        int[] newArr = performMultiplication(second);
+        double[] newArr = performMultiplication(second);
 
         cols = second.getCols();
-        matrix = new Integer[rows][cols];
+        matrix = new Double[rows][cols];
 
         int ind = 0;
         for(int a=0; a<rows; a++) {
@@ -148,7 +148,7 @@ public abstract class BasicMatrix {
      * Transposes current matrix (Columns become rows and rows become columns)
      */
     public void transpose() {
-        Integer[] arr = new Integer[rows * cols];
+        Double[] arr = new Double[rows * cols];
         int ind=0;
 
         // Copy old values
@@ -164,7 +164,7 @@ public abstract class BasicMatrix {
         rows = cols;
         cols = tmp;
         // Reinitialize array
-        matrix = new Integer[rows][cols];
+        matrix = new Double[rows][cols];
 
         ind = 0;
 
@@ -195,7 +195,7 @@ public abstract class BasicMatrix {
         if(!haveSameDimensions(second))
             return false;
 
-        int[] multRes = performMultiplication(second);
+        double[] multRes = performMultiplication(second);
 
         for(int i=0; i<multRes.length; i++)
             if(multRes[i] != 1)
@@ -208,7 +208,7 @@ public abstract class BasicMatrix {
         if(rows != second.getRows())
             throw new MatrixException("Matrices must have the same amount of rows be augmented.");
 
-        Integer[][] newArr = new Integer[rows][cols+second.getCols()];
+        Double[][] newArr = new Double[rows][cols+second.getCols()];
 
         // Copy our elements first
         for(int a=0; a<rows; a++) {
@@ -242,8 +242,8 @@ public abstract class BasicMatrix {
      * @param r 2D Array row number, '0' based number.
      * @return 1D Array containing specified row
      */
-    private Integer[] getRow(int r) {
-        Integer[] row = new Integer[cols];
+    private Double[] getRow(int r) {
+        Double[] row = new Double[cols];
 
         for(int i=0; i<cols; i++)
             row[i] = matrix[r][i];
@@ -255,8 +255,8 @@ public abstract class BasicMatrix {
      * @param c 2D Array column number, '0' based number.
      * @return 1D Array containing specified column
      */
-    private Integer[] getCol(int c) {
-        Integer[] col = new Integer[rows];
+    private Double[] getCol(int c) {
+        Double[] col = new Double[rows];
 
         for (int a=0; a<rows; a++)
             col[a] = matrix[a][c];
@@ -264,7 +264,7 @@ public abstract class BasicMatrix {
         return col;
     }
 
-    private void addAt(int r, int c, int value) {
+    private void addAt(int r, int c, double value) {
         validateBounds(r, c);
 
         matrix[r-1][c-1] += value;
@@ -287,8 +287,8 @@ public abstract class BasicMatrix {
         if(r1 == r2)
             return;
 
-        Integer[] row1 = getRow(r1-1);
-        Integer[] row2 = getRow(r2-1);
+        Double[] row1 = getRow(r1-1);
+        Double[] row2 = getRow(r2-1);
 
         for(int i=0; i<cols; i++) {
             matrix[r1-1][i] = row2[i];
@@ -302,15 +302,34 @@ public abstract class BasicMatrix {
      * @param scalar Scalar
      * @throws IndexOutOfBoundsException Thrown when 'r' is out of bounds
      */
-    public void multiplyRow(int r, int scalar) throws IndexOutOfBoundsException {
+    public void multiplyRow(int r, double scalar) throws IndexOutOfBoundsException {
         if(r < 1 || r > rows)
             throw new IndexOutOfBoundsException("Row number " + r + " is out of bounds");
 
         for(int i=0; i<cols; i++)
             matrix[r-1][i] *= scalar;
     }
+    
+    public void toEchelon() {
+        if(!isFull())
+            throw new MatrixException("Matrix not Full");
 
+        for(int a=0; a<rows; a++) {
+            double iVal = matrix[a][a];
 
+            double dMult = 1 / iVal;
+            multiplyRow(a+1, dMult);
+
+            // TODO: Do row subtraction...
+            for(int i=a+1; i<cols; i++) {
+
+            }
+        }
+    }
+
+    public void toReducedEchelon() {
+
+    }
 
 
 
@@ -367,8 +386,8 @@ public abstract class BasicMatrix {
         return true;
     }
 
-    int[][] toArray() {
-        int[][] res = new int[rows][cols];
+    double[][] toArray() {
+        double[][] res = new double[rows][cols];
         for(int a=0; a<rows; a++) {
             for (int i = 0; i < cols; i++) {
                 res[a][i] = matrix[a][i];

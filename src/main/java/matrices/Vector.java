@@ -12,7 +12,7 @@ public class Vector extends BasicMatrix {
         checkDimensions(rows, cols);
     }
 
-    public Vector(int[] val) {
+    public Vector(double[] val) {
         super(1, val.length);
         set(val);
 
